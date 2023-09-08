@@ -7,10 +7,18 @@ $pdo = new PDO(
     $dbPassword
 );
 
-$sql = 'SELECT * FROM pages';
+if (isset($_GET['search'])) {
+  $name = '%' . $_GET["search"]. '%';
+  $contents = '%' . $_GET["search"]. '%';
+} else {
+  $name = '%%';
+  $contents = '%%';
+}
+
+$sql = 'SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents';
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':title', $title, PDO::PARAM_STR);
-$statement->bindValue(':content', $content, PDO::PARAM_STR);
+$statement->bindValue(':name', $name, PDO::PARAM_STR);
+$statement->bindValue(':contents', $contents, PDO::PARAM_STR);
 $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -28,6 +36,10 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <div>
     <div>
+      <form action="index.php" method="GET">
+            <input type="text" name="search"><br>
+            <input type="submit">
+      </form>
       <form action="index.php" method="get">
         <div>
           <label>
