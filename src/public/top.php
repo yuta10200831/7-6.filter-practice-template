@@ -8,12 +8,24 @@ $pdo = new PDO(
 );
 
 $sql = 'SELECT * FROM pages';
+$params = [];
+
+if (isset($_GET['date'])) {
+  $date = $_GET['date'];
+  $sql .= ' WHERE DATE(created_at) = :date';
+  $params[':date'] = $date;
+}
+
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':title', $title, PDO::PARAM_STR);
-$statement->bindValue(':content', $content, PDO::PARAM_STR);
+
+foreach ($params as $key => $value) {
+  $statement->bindValue($key, $value, PDO::PARAM_STR);
+}
+
 $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">

@@ -40,6 +40,12 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
             <input type="text" name="search"><br>
             <input type="submit">
       </form>
+      <div>
+        <form action="top.php" method="GET">
+          <input type="date" name="date"><br>
+          <input type="submit" value="日付で検索">
+        </form>
+      </div>
       <form action="index.php" method="get">
         <div>
           <label>
