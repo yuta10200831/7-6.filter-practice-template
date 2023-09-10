@@ -7,19 +7,27 @@ $pdo = new PDO(
     $dbPassword
 );
 
+$params = [];
+$sql = "SELECT * FROM pages WHERE 1=1";
+
 if (isset($_GET['search'])) {
-  $name = '%' . $_GET["search"]. '%';
-  $contents = '%' . $_GET["search"]. '%';
-} else {
-  $name = '%%';
-  $contents = '%%';
+  $name = '%' . $_GET['search'] . '%';
+  $contents = '%' . $_GET['search'] . '%';
+  $sql .= ' AND (name LIKE :name OR contents LIKE :contents)';
+  $params[':name'] = $name;
+  $params[':contents'] = $contents;
 }
 
-$sql = 'SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents';
+if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
+  $start_date = $_GET['start_date'] . " 00:00:00";
+  $end_date = $_GET['end_date'] . " 23:59:59";
+  $sql .= ' AND (created_at BETWEEN :start_date AND :end_date)';
+  $params[':start_date'] = $start_date;
+  $params[':end_date'] = $end_date;
+}
+
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':name', $name, PDO::PARAM_STR);
-$statement->bindValue(':contents', $contents, PDO::PARAM_STR);
-$statement->execute();
+$statement->execute($params);
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -41,7 +49,7 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
             <input type="text" name="search"><br>
             <input type="submit">
       </form>
-      <form action="page.php" method="get">
+      <form action="mypage.php" method="get">
             <input type="date" name="start_date">
             <input type="date" name="end_date">
             <button type="submit">期間で絞り込む</button>
