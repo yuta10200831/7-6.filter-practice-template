@@ -40,7 +40,7 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <div>
     <div>
-      <form action="index.php" method="get">
+      <form action="top.php" method="get">
         <div>
           <label>
             <input type="radio" name="order" value="desc" class="">
