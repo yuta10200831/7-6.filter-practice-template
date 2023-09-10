@@ -7,18 +7,32 @@ $pdo = new PDO(
     $dbPassword
 );
 
-if (isset($_GET['search'])) {
-  $name = '%' . $_GET["search"]. '%';
-  $contents = '%' . $_GET["search"]. '%';
-} else {
-  $name = '%%';
-  $contents = '%%';
+$search = $_GET['search'] ?? '';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+$order = $_GET['order'] ?? 'desc';
+
+if (!in_array($order, ['asc', 'desc'], true)) {
+  $order = 'desc';
 }
 
-$sql = 'SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents';
+$sql = "SELECT * FROM pages WHERE (name LIKE :search OR contents LIKE :search)";
+if (!empty($start_date)) {
+    $sql .= " AND created_at >= :start_date";
+}
+if (!empty($end_date)) {
+    $sql .= " AND created_at <= :end_date";
+}
+$sql .= " ORDER BY created_at $order";
+
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':name', $name, PDO::PARAM_STR);
-$statement->bindValue(':contents', $contents, PDO::PARAM_STR);
+$statement->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+if (!empty($start_date)) {
+    $statement->bindValue(':start_date', $start_date . " 00:00:00", PDO::PARAM_STR);
+}
+if (!empty($end_date)) {
+    $statement->bindValue(':end_date', $end_date . " 23:59:59", PDO::PARAM_STR);
+}
 $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -37,9 +51,10 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <div>
     <div>
-      <form action="index.php" method="GET">
-            <input type="text" name="search"><br>
-            <input type="submit">
+      <form action="mytop.php" method="GET">
+        <input type="text" name="search"><br>
+        <input type="date" name="date"><br>
+        <input type="submit">
       </form>
       <form action="page.php" method="get">
             <input type="date" name="start_date">
