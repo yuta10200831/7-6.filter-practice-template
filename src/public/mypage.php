@@ -7,14 +7,31 @@ $pdo = new PDO(
     $dbPassword
 );
 
-$sql = 'SELECT * FROM pages';
+$search = $_GET['search'] ?? '';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+
+$sql = "SELECT * FROM pages WHERE (name LIKE :search OR contents LIKE :search)";
+if (!empty($start_date)) {
+    $sql .= " AND created_at >= :start_date";
+}
+if (!empty($end_date)) {
+    $sql .= " AND created_at <= :end_date";
+}
+
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':title', $title, PDO::PARAM_STR);
-$statement->bindValue(':content', $content, PDO::PARAM_STR);
+$statement->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+if (!empty($start_date)) {
+    $statement->bindValue(':start_date', $start_date . ' 00:00:00', PDO::PARAM_STR);
+}
+if (!empty($end_date)) {
+    $statement->bindValue(':end_date', $end_date . ' 23:59:59', PDO::PARAM_STR);
+}
 
 $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
