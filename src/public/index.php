@@ -84,6 +84,21 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <div>
     <div>
+      <form action="privatetop.php" method="GET">
+            <input type="text" name="search"><br>
+            <input type="date" name="start_date">
+            <input type="date" name="end_date">
+            <br>
+            <label>
+            <input type="radio" name="order" value="desc" class="">
+            <span>新着順</span>
+          </label>
+          <label>
+            <input type="radio" name="order" value="asc" class="">
+            <span>古い順</span>
+          </label>
+            <br>
+            <input type="submit">
       <form action="mypage.php" method="GET">
         <input type="text" name="search"><br>
         <input type="date" name="start_date">
