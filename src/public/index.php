@@ -7,15 +7,20 @@ $pdo = new PDO(
     $dbPassword
 );
 
+// 並び替えの順番を取得
+$order = $_GET['order'] ?? 'desc';
+$order = ($order === 'asc') ? 'asc' : 'desc';
+
+$name = '%%';
+$contents = '%%';
+
+// 検索機能
 if (isset($_GET['search'])) {
-  $name = '%' . $_GET["search"]. '%';
-  $contents = '%' . $_GET["search"]. '%';
-} else {
-  $name = '%%';
-  $contents = '%%';
+    $name = '%' . $_GET['search'] . '%';
+    $contents = '%' . $_GET['search'] . '%';
 }
 
-$sql = 'SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents';
+$sql = "SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents ORDER BY created_at $order";
 $statement = $pdo->prepare($sql);
 $statement->bindValue(':name', $name, PDO::PARAM_STR);
 $statement->bindValue(':contents', $contents, PDO::PARAM_STR);
