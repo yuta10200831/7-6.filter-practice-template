@@ -7,10 +7,25 @@ $pdo = new PDO(
     $dbPassword
 );
 
-$sql = 'SELECT * FROM pages';
+$search = $_GET['search'] ?? '';
+$date = $_GET['date'] ?? '';
+$order = $_GET['order'] ?? 'desc';
+
+if (!in_array($order, ['asc', 'desc'], true)) {
+  $order = 'desc';
+}
+
+$sql = "SELECT * FROM pages WHERE (name LIKE :search OR contents LIKE :search)";
+if (!empty($date)) {
+    $sql .= " AND DATE(created_at) = :date";
+}
+$sql .= " ORDER BY created_at $order";
+
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':title', $title, PDO::PARAM_STR);
-$statement->bindValue(':content', $content, PDO::PARAM_STR);
+$statement->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+if (!empty($date)) {
+    $statement->bindValue(':date', $date, PDO::PARAM_STR);
+}
 $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -29,6 +44,9 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
   <div>
     <div>
       <form action="index.php" method="get">
+        <input type="text" name="search"><br>
+        <input type="date" name="start_date">
+        <input type="date" name="end_date">
         <div>
           <label>
             <input type="radio" name="order" value="desc" class="">

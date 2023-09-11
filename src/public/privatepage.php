@@ -7,14 +7,18 @@ $pdo = new PDO(
     $dbPassword
 );
 
-$sql = 'SELECT * FROM pages';
-$statement = $pdo->prepare($sql);
-$statement->bindValue(':title', $title, PDO::PARAM_STR);
-$statement->bindValue(':content', $content, PDO::PARAM_STR);
+// 並び替えの順番を取得
+$order = $_GET['order'] ?? 'desc'; // デフォルトを 'desc' に設定
+$order = ($order === 'asc') ? 'asc' : 'desc'; // それ以外は 'desc'
 
-$statement->execute();
+// SQLクエリ
+$sql = "SELECT * FROM pages ORDER BY  created_at $order";
+$statement = $pdo->query($sql);
+
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
