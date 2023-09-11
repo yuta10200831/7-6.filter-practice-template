@@ -7,6 +7,26 @@ $pdo = new PDO(
     $dbPassword
 );
 
+$params = [];
+$sql = "SELECT * FROM pages WHERE 1=1";
+
+if (isset($_GET['search'])) {
+  $name = '%' . $_GET['search'] . '%';
+  $contents = '%' . $_GET['search'] . '%';
+  $sql .= ' AND (name LIKE :name OR contents LIKE :contents)';
+  $params[':name'] = $name;
+  $params[':contents'] = $contents;
+}
+
+if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
+  $start_date = $_GET['start_date'] . " 00:00:00";
+  $end_date = $_GET['end_date'] . " 23:59:59";
+  $sql .= ' AND (created_at BETWEEN :start_date AND :end_date)';
+  $params[':start_date'] = $start_date;
+  $params[':end_date'] = $end_date;
+}
+
+=======
 // 並び替えの順番を取得
 $order = $_GET['order'] ?? 'desc';
 $order = ($order === 'asc') ? 'asc' : 'desc';
@@ -22,9 +42,7 @@ if (isset($_GET['search'])) {
 
 $sql = "SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents ORDER BY created_at $order";
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':name', $name, PDO::PARAM_STR);
-$statement->bindValue(':contents', $contents, PDO::PARAM_STR);
-$statement->execute();
+$statement->execute($params);
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -46,6 +64,8 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
             <input type="text" name="search"><br>
             <input type="submit">
       </form>
+      <form action="mypage.php" method="get">
+
       <div>
         <form action="top.php" method="GET">
           <input type="date" name="date"><br>

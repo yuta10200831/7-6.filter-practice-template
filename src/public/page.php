@@ -29,7 +29,6 @@ $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
