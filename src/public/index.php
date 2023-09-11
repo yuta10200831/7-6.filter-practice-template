@@ -7,21 +7,27 @@ $pdo = new PDO(
     $dbPassword
 );
 
+// 並び替えの順番を取得
+$order = $_GET['order'] ?? 'desc';
+$order = ($order === 'asc') ? 'asc' : 'desc';
+
+$name = '%%';
+$contents = '%%';
+
+// 検索機能
 if (isset($_GET['search'])) {
-  $name = '%' . $_GET["search"]. '%';
-  $contents = '%' . $_GET["search"]. '%';
-} else {
-  $name = '%%';
-  $contents = '%%';
+    $name = '%' . $_GET['search'] . '%';
+    $contents = '%' . $_GET['search'] . '%';
 }
 
-$sql = 'SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents';
+$sql = "SELECT * FROM pages WHERE name LIKE :name OR contents LIKE :contents ORDER BY created_at $order";
 $statement = $pdo->prepare($sql);
 $statement->bindValue(':name', $name, PDO::PARAM_STR);
 $statement->bindValue(':contents', $contents, PDO::PARAM_STR);
 $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -46,6 +52,11 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
           <input type="submit" value="日付で検索">
         </form>
       </div>
+      <form action="page.php" method="get">
+            <input type="date" name="start_date">
+            <input type="date" name="end_date">
+            <button type="submit">期間で絞り込む</button>
+      </form>
       <form action="index.php" method="get">
         <div>
           <label>
