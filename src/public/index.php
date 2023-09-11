@@ -84,6 +84,12 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <div>
     <div>
+      <form action="mypage.php" method="GET">
+        <input type="text" name="search"><br>
+        <input type="date" name="start_date">
+        <input type="date" name="end_date">
+        <input type="submit">
+      </form>
       <form action="mytop.php" method="GET">
         <input type="text" name="search"><br>
         <input type="date" name="date"><br>
