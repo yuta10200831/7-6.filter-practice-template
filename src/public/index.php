@@ -28,6 +28,7 @@ $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -45,7 +46,12 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
             <input type="text" name="search"><br>
             <input type="submit">
       </form>
-      <form action="privatepage.php" method="get">
+      <form action="page.php" method="get">
+            <input type="date" name="start_date">
+            <input type="date" name="end_date">
+            <button type="submit">期間で絞り込む</button>
+      </form>
+      <form action="index.php" method="get">
         <div>
           <label>
             <input type="radio" name="order" value="desc" class="">

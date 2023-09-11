@@ -8,9 +8,23 @@ $pdo = new PDO(
 );
 
 $sql = 'SELECT * FROM pages';
+$params = [];
+
+$start_date = $_GET['start_date'] ?? null;
+$end_date = $_GET['end_date'] ?? null;
+
+if ($start_date && $end_date) {
+    $sql .= ' WHERE created_at BETWEEN :start_date AND :end_date';
+    $params[':start_date'] = $start_date . ' 00:00:00';  // 日付の始まり
+    $params[':end_date'] = $end_date . ' 23:59:59';  // 日付の終わり
+}
+
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':title', $title, PDO::PARAM_STR);
-$statement->bindValue(':content', $content, PDO::PARAM_STR);
+
+foreach ($params as $key => $value) {
+    $statement->bindValue($key, $value, PDO::PARAM_STR);
+}
+
 $statement->execute();
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
