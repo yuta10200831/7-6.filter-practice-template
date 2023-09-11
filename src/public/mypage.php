@@ -7,14 +7,30 @@ $pdo = new PDO(
     $dbPassword
 );
 
-$sql = 'SELECT * FROM pages';
-$statement = $pdo->prepare($sql);
-$statement->bindValue(':title', $title, PDO::PARAM_STR);
-$statement->bindValue(':content', $content, PDO::PARAM_STR);
+$params = [];
+$sql = "SELECT * FROM pages WHERE 1=1";
 
-$statement->execute();
+if (isset($_GET['search'])) {
+  $name = '%' . $_GET['search'] . '%';
+  $contents = '%' . $_GET['search'] . '%';
+  $sql .= ' AND (name LIKE :name OR contents LIKE :contents)';
+  $params[':name'] = $name;
+  $params[':contents'] = $contents;
+}
+
+if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
+  $start_date = $_GET['start_date'] . " 00:00:00";
+  $end_date = $_GET['end_date'] . " 23:59:59";
+  $sql .= ' AND (created_at BETWEEN :start_date AND :end_date)';
+  $params[':start_date'] = $start_date;
+  $params[':end_date'] = $end_date;
+}
+
+$statement = $pdo->prepare($sql);
+$statement->execute($params);
 $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -30,7 +46,7 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
   <div>
 
     <div>
-      <form action="index.php" method="get">
+      <form action="mypage.php" method="get">
         <div>
           <label>
             <input type="radio" name="order" value="desc" class="">
@@ -44,7 +60,7 @@ $pages = $statement->fetchAll(PDO::FETCH_ASSOC);
         <button type="submit">送信</button>
       </form>
     </div>
-    
+
     <div>
       <table border="1">
         <tr>
